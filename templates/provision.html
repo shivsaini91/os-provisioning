@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: white; /* Change background color to white */
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: rgba(0, 0, 0, 0.3); /* Fade color for "Hacker World" text */
+        }
+        
+        .container {
+            background-color: black;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 800px; /* Double the width of the container */
+            height: 60%; /* Increase height by 30% */
+        }
+        
+        h1 {
+            font-size: 36px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            font-size: 30px; /* Increase font size to 30% */
+            color: white;
+            margin-top: 0;
+        }
+        
+        label {
+            font-size: 18px;
+            color: white;
+        }
+        
+        input[type="radio"], input[type="text"], input[type="password"] {
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.2s ease-in-out; /* Adding transition for hover effect */
+        }
+        
+        input[type="text"]:hover, input[type="password"]:hover {
+            transform: scale(1.05); /* Enlarge on hover */
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50; /* Green */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .hacker-text {
+            font-size: 24px; /* Adjust font size for "Hacker World" text */
+            color: rgba(255, 255, 255, 0.7); /* Slightly transparent white color */
+            margin-bottom: 20px;
+        }        
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <h2>OS Provision</h2> <!-- Change heading to "OS Provision" -->
+        <form method="POST" action="/adp">
+            <label>
+                <input type="radio" name="service" value="LAMP"> LAMP
+            </label>
+            <label>
+                <input type="radio" name="service" value="DevOps"> DevOps
+            </label>
+            <label>
+                <input type="radio" name="service" value="Cyber"> Cyber
+            </label>
+            <label>
+                <input type="radio" name="service" value="Basic"> Basic
+            </label>
+            <br>
+            <input type="text" name="ip" placeholder="IP Address" required>
+            <br>
+            <input type="text" name="user" placeholder="Username" required>
+            <br>
+            <input type="password" name="password" placeholder="Password" required>
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+     <!-- Added "Hacker World" text -->
+</body>
+</html>

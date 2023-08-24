@@ -1,0 +1,9 @@
+# Generated Ansible Inventory
+Hi shiv gen file is:
+===========================
+
+Name: citywooferphp 
+Age: 32423424234
+
+===========================
+good it is done
