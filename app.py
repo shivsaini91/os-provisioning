@@ -176,8 +176,9 @@ def adp():
     ip = request.form['ip'].split(',') 
     password = request.form['password']
     user = request.form['user']
-
-    with open('/home/shiv/api/ait.j2', 'r') as template_file:
+    script_dir = os.path.dirname(__file__)
+    aitj2=os.path.join(script_dir,'ait.j2')
+    with open(aitj2, 'r') as template_file:
         template_content = template_file.read()
 
     template = Template(template_content)
@@ -188,18 +189,23 @@ def adp():
     ).strip()
 
     # Save the generated text to a file
-    with open('/home/shiv/api/tt/aif.ini', 'w') as f:
+    aifini=os.path.join(script_dir,'tt/aif.ini')
+    with open(aifini, 'w') as f:
         f.write(generated_text)
+    lyaml=os.path.join(script_dir,'lamp.yml')
+    dyaml=os.path.join(script_dir,'devops.yml')
+    cyaml=os.path.join(script_dir,'cyber.yml')
+    byaml=os.path.join(script_dir,'basic.yml')
     # Execute Linux command based on selected service
     if service == 'LAMP':
-        command = 'ansible-playbook -i  /home/shiv/api/tt/aif.ini /home/shiv/api/lamp.yaml'
+        command = f'ansible-playbook -i  aifini "{lyaml}"'
         # command = 'ls'
     elif service == 'DevOps':
-        command = '/usr/bin/ansible-playbook -i  /home/shiv/api/tt/aif.ini /home/shiv/api/devops.yaml'
+        command = f'ansible-playbook -i  aifini "{dyaml}"'
     elif service == 'Cyber':
-        command = 'ansible-playbook -i  /home/shiv/api/tt/aif.ini /home/shiv/api/cyber.yaml'
+        command = f'ansible-playbook -i  aifini "{cyaml}"'
     elif service == 'Basic':
-        command = 'ansible-playbook -i  /home/shiv/api/tt/aif.ini /home/shiv/api/basic.yml'
+        command = f'ansible-playbook -i  aifini "{byaml}"'
     else:
         return 'Invalid service selection'
 
