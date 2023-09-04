@@ -30,41 +30,14 @@ cursor = db_connection.cursor()
 
 
 #token check function
-# def token_required(f):
-#     @wraps(f)
-#     def decorated(*args, **kwargs):
-#         token = request.cookies.get('token')
-#         # api_key = request.headers.get('API-Key')
-#         # token = request.args.get('token')
-
-#         if not token:
-#             return jsonify({'message': 'Token is missing!'}), 401
-
-#         try:
-#             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-#         except jwt.ExpiredSignatureError:
-#             return jsonify({'message': 'Token has expired!'}), 401
-#         except jwt.InvalidTokenError:
-#             return jsonify({'message': 'Invalid token!'}), 401
-
-#         return f(*args, **kwargs)
-
-#     return decorated
-
-#api key decorator
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.cookies.get('token')
+        # token = request.args.get('token')
+
         if not token:
             return jsonify({'message': 'Token is missing!'}), 401
-
-        cursor = db_connection.cursor()
-        cursor.execute('SELECT api_key FROM login WHERE api_key = %s', (token,))
-        api_key_match = cursor.fetchone()
-
-        if not api_key_match:
-            return jsonify({'message': 'Invalid token!'}), 401
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
@@ -77,9 +50,31 @@ def token_required(f):
 
     return decorated
 
+#api key decorator
+# def token_required(f):
+#     @wraps(f)
+#     def decorated(*args, **kwargs):
+#         token = request.cookies.get('token')
+#         if not token:
+#             return jsonify({'message': 'Token is missing!'}), 401
 
+#         cursor = db_connection.cursor()
+#         cursor.execute('SELECT api_key FROM login WHERE api_key = %s', (token,))
+#         api_key_match = cursor.fetchone()
 
+#         if not api_key_match:
+#             return jsonify({'message': 'Invalid token!'}), 401
 
+#         try:
+#             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+#         except jwt.ExpiredSignatureError:
+#             return jsonify({'message': 'Token has expired!'}), 401
+#         except jwt.InvalidTokenError:
+#             return jsonify({'message': 'Invalid token!'}), 401
+
+#         return f(*args, **kwargs)
+
+#     return decorated
 
 
 
@@ -96,57 +91,6 @@ def generate_api_key():
 
 
 #api key token
-@app.route('/login', methods=['POST'])
-def login():
-    username = request.form['username']
-    password = request.form['password']
-
-    cursor = db_connection.cursor()
-    cursor.execute('SELECT * FROM login WHERE username = %s', (username,))
-    user = cursor.fetchone()
-    # return jsonify(user)
-
-    if not user:
-        # User doesn't exist, insert new user logic
-        hashed_password = generate_password_hash(password)
-        api_key = generate_api_key()
-        cursor.execute('INSERT INTO login (username, password, api_key) VALUES (%s, %s, %s)', (username, hashed_password, api_key))
-        db_connection.commit()
-        # cursor.fetchall()  # Consume the unread result from the previous query
-        cursor.close()
-        
-        token = jwt.encode({'user': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm='HS256')
-        response = make_response(jsonify({'message': 'Login successful New................'}))
-        response.set_cookie('token', token, httponly=True)  # Store token in an HTTP-only cookie
-        
-        return response
-    else:
-        # User exists, check password logic
-        if check_password_hash(user[2], password):
-            session['username'] = username            
-            if user[3] is None:
-                # User has no API key, generate and update API key
-                api_key = generate_api_key()
-                app.logger.info("Generated API key: %s", api_key)
-                cursor.execute('UPDATE login SET api_key = %s WHERE username = %s', (api_key, username))
-                db_connection.commit()  
-                cursor.close()            
-                return jsonify({'message': 'Login successful ********************** exist', 'api_key': api_key})            
-            else:
-                api_key = user[3]  # Use the existing API key     
-
-            cursor.close()            
-            return render_template('provision.html')
-
-        else:
-            cursor.close()            
-            error_message = 'Login failed Try Again'
-            return render_template('login.html', error_message=error_message)
-        
-
-    
-
-#login token
 # @app.route('/login', methods=['POST'])
 # def login():
 #     username = request.form['username']
@@ -155,19 +99,72 @@ def login():
 #     cursor = db_connection.cursor()
 #     cursor.execute('SELECT * FROM login WHERE username = %s', (username,))
 #     user = cursor.fetchone()
+#     # return jsonify(user)
 
-#     if user and user[2] == password:
-#         session['username'] = username
-#         # session['username'] = token
-
-# #        return redirect(url_for('gen')) # or
+#     if not user:
+#         # User doesn't exist, insert new user logic
+#         hashed_password = generate_password_hash(password)
+#         api_key = generate_api_key()
+#         cursor.execute('INSERT INTO login (username, password, api_key) VALUES (%s, %s, %s)', (username, hashed_password, api_key))
+#         db_connection.commit()
+#         # cursor.fetchall()  # Consume the unread result from the previous query
+#         cursor.close()
+        
 #         token = jwt.encode({'user': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm='HS256')
-#         # return jsonify({'token': token})
-#         response = make_response(jsonify({'message': 'Login successful'}))
+#         response = make_response(jsonify({'message': 'Login successful New................'}))
 #         response.set_cookie('token', token, httponly=True)  # Store token in an HTTP-only cookie
+        
 #         return response
 #     else:
-#         return 'Login failed'
+#         # User exists, check password logic
+#         if check_password_hash(user[2], password):
+#             session['username'] = username            
+#             if user[3] is None:
+#                 # User has no API key, generate and update API key
+#                 api_key = generate_api_key()
+#                 app.logger.info("Generated API key: %s", api_key)
+#                 cursor.execute('UPDATE login SET api_key = %s WHERE username = %s', (api_key, username))
+#                 db_connection.commit()  
+#                 cursor.close()            
+#                 return jsonify({'message': 'Login successful ********************** exist', 'api_key': api_key})            
+#             else:
+#                 api_key = user[3]  # Use the existing API key     
+
+#             cursor.close()            
+#             return render_template('provision.html')
+
+#         else:
+#             cursor.close()            
+#             error_message = 'Login failed Try Again'
+#             return render_template('login.html', error_message=error_message)
+        
+
+    
+
+#login token
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+
+    cursor = db_connection.cursor()
+    cursor.execute('SELECT * FROM login WHERE username = %s', (username,))
+    user = cursor.fetchall()
+    if user and user[0][2] == password:
+        session['username'] = username
+        # session['username'] = token
+#       return redirect(url_for('gen')) # or
+        token = jwt.encode({'user': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm='HS256')
+        # return jsonify({'token': token})
+        response = make_response(jsonify({'message': 'Login successful'}))
+        response.set_cookie('token', token, httponly=True)  # Store token in an HTTP-only cookie
+        return render_template('provision.html')
+    else:
+        error_message = 'Login failed Try Again'
+        return render_template('login.html', error_message=error_message)
+    
+
+
     
 # ansible data processing
 @app.route('/adp', methods=['POST'])
@@ -252,6 +249,7 @@ def add_user():
 
 
 @app.route('/cmd')
+# @token_required
 def index():
     return render_template('index.html')
 
