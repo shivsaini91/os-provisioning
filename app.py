@@ -52,16 +52,36 @@ def token_required(f):
 
 
 
-@app.route('/')
-def home():
-    return render_template('login.html')
-    # return render_template('provision.html')
+# @app.route('/')
+# def home():
+#     return render_template('login.html')
+#     # return render_template('provision.html')
 
 
 
 # Generate a 64-character hex token
 def generate_api_key():
     return secrets.token_hex(32)  
+
+
+@app.route('/')
+def home():
+    token = request.cookies.get('token')
+
+    if token:
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            # Check if the token is valid (e.g., not expired)
+            if data and 'user' in data:
+                # Token is valid, render 'provision.html'
+                return render_template('provision.html')
+        except jwt.ExpiredSignatureError:
+            pass  # Token has expired
+        except jwt.InvalidTokenError:
+            pass  # Invalid token
+
+    # If there's no valid token or an error occurred, render 'login.html'
+    return render_template('login.html')
 
     
 
@@ -140,18 +160,6 @@ def adp():
 
     return f'Command Output: {command_output}<br>Command Result: {result_message}'
   
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
