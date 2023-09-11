@@ -13,3 +13,5 @@
         src: ./install.sh
         dest: /install.sh
       become: true
+    # - name: "Execute the script"
+    #   command: sh /install.sh
