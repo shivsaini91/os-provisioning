@@ -98,9 +98,10 @@ def login():
         session['username'] = username
 
         token = jwt.encode({'user': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm='HS256')
+        expiration_time = datetime.datetime.utcnow() + datetime.timedelta(days=30)
 
         response = make_response(render_template('provision.html'))
-        response.set_cookie('token', token, httponly=True, path='/')  
+        response.set_cookie('token', token, httponly=True, path='/', expires=expiration_time)  
         return response
     else:
         error_message = 'Login failed Try Again'
